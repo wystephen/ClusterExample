@@ -11,6 +11,8 @@ from matplotlib import cm
 import DataGenerator
 
 
+
+
 def KMeans(Data,k=5):
     '''
     KMeans Methond
@@ -19,7 +21,76 @@ def KMeans(Data,k=5):
     :return:
     '''
 
-    return np.zeros(Data.shape[0])
+    if Data.shape[0] == 0:
+        return np.zeros(Data.shape[0])
+
+    labels = np.zeros(Data.shape[0])
+
+    '''
+    Initial k center points
+    '''
+    centre_points = np.zeros([k,Data.shape[1]])
+
+    centre_points[:,0] = np.random.uniform(min(Data[:,0]),max(Data[:,0]),k)
+    centre_points[:,1] = np.random.uniform(min(Data[:,1]),max(Data[:,1]),k)
+
+
+    '''
+    cluster
+    '''
+
+    centre_changed = True
+
+    while centre_changed:
+        centre_changed = False
+
+        '''
+        1. computer centre point
+        '''
+        for i in range(Data.shape[0]):
+            all_dis = np.sum((Data[i,:]-centre_points)**2.0,1)
+            # print("all dis:",all_dis)
+            # print("index :",np.argmin(all_dis))
+            labels[i] = np.argmin(all_dis)
+
+
+        '''
+        2. update centre point
+        '''
+        tmp_centre_point = np.zeros_like(centre_points)
+        centre_counter = np.zeros(k)
+        for i in range(Data.shape[0]):
+            # print(Data[i,:])
+            # print("label:",labels[i])
+            tmp_centre_point[int(labels[i]),:] +=Data[i,:]
+            centre_counter[int(labels[i])] += 1
+
+        # tmp_centre_point = tmp_centre_point / centre_counter
+        for i in range(tmp_centre_point.shape[0]):
+            if(centre_counter[i]>0):
+
+                tmp_centre_point[i,:] = tmp_centre_point[i,:] / float(centre_counter[i])
+            else:
+                continue
+            if np.linalg.norm(tmp_centre_point[i,:]-centre_points[i,:]) > 0.1:
+                centre_points[i,:] = tmp_centre_point[i,:]
+                centre_changed=True
+
+        # if np.linalg.norm(tmp_centre_point-centre_points) > 0.2:
+        #     centre_points = tmp_centre_point
+        #     centre_changed = True
+
+
+
+    print("lable:",labels)
+    return labels
+
+
+
+
+
+
+
 
 def ISODATA(Data,k=5):
     '''
@@ -28,6 +99,7 @@ def ISODATA(Data,k=5):
     :param k:
     :return:
     '''
+
 
 
 
