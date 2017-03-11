@@ -13,7 +13,7 @@ import DataGenerator
 
 
 
-def KMeans(Data,k=5):
+def KMeans(Data,k=5,theta_N = 20,theta_S=1.0,theta_c =1.0,L=1,I=1):
     '''
     KMeans Methond
     :param Data:
@@ -72,7 +72,7 @@ def KMeans(Data,k=5):
                 tmp_centre_point[i,:] = tmp_centre_point[i,:] / float(centre_counter[i])
             else:
                 continue
-            if np.linalg.norm(tmp_centre_point[i,:]-centre_points[i,:]) > 0.1:
+            if np.linalg.norm(tmp_centre_point[i,:]-centre_points[i,:]) > 0.02:
                 centre_points[i,:] = tmp_centre_point[i,:]
                 centre_changed=True
 
@@ -100,15 +100,20 @@ def ISODATA(Data,k=5):
     :return:
     '''
 
-
+    # if(Data.shape[0]==0)
+    #     return np.zeros()
+    return np.zeros(Data.shape[0])
 
 
 
 if __name__ == '__main__':
+    N = 0
+    while N < 100:
+        N+=1
     print("begin Test")
     dg = DataGenerator.DataGenerator()
 
-    test_data ,test_label = dg.HandleData(2000)
+    test_data ,test_label = dg.HandleData(1000)
     # plot resource data
     test_fig = plt.figure()
     ax = test_fig.add_subplot(131)
@@ -137,7 +142,19 @@ if __name__ == '__main__':
 
         ax1.plot(test_data[index_list,0],test_data[index_list,1],'+',color=cm.jet(i*70+10))
 
+    # ISODATA result
+    ax2 = test_fig.add_subplot(133)
+    ax2.grid(True)
 
+    iso_label = ISODATA(test_data,5)
+
+    for i in range(int(max(iso_label)-min(iso_label)+1)):
+        index_list = list()
+        for k in range(iso_label.shape[0]):
+            if iso_label[k] == i:
+                index_list.append(k)
+
+        ax2.plot(test_data[index_list,0],test_data[index_list,1],'+',color = cm.jet(i*70+10))
 
 
 
