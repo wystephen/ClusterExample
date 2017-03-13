@@ -70,5 +70,6 @@ if __name__ == '__main__':
     plt.grid(True)
     # plt.hold(True)
 
-    plt.plot(data[:,0],data[:,1],'r*')
+    plt.plot(data[:,0],data[:,1],'b*')
+    plt.savefig("source_data.jpg")
     plt.show()

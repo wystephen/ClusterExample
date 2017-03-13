@@ -10,6 +10,44 @@ from matplotlib import cm
 
 import DataGenerator
 
+def plotAndSave(CentrePoints,all_data):
+    lowb = 0.0
+    highb = 5.0
+    step = 0.1
+
+    pro_array = np.zeros([int((highb-lowb)/step),int((highb-lowb)/step)])
+
+    for ii in range(50):
+        for jj in range(50):
+            iii = ii * 0.1
+            jjj = jj * 0.1
+
+            # print("i:{0} j:{1} index i:{2} index j:{3}".format(i,j,int((i-lowb)/step),int((j-lowb)/step)))
+            current_point = np.zeros(2,dtype=float)
+            current_point[1] = iii
+            current_point[0] = jjj
+            # print(current_point-CentrePoints,"\n\n\n\n\n\n\n\n\n\n")
+            # print(int(iii*10),int(jjj*10))
+            pro_array[int(iii*10),int((jjj*10))] = np.min(np.sum((current_point-CentrePoints)**2.0,1)**0.5)#
+    pro_array /= np.sum(pro_array)
+    print("center points :",CentrePoints)
+    # pro_array = (pro_array-0)/np.max(pro_array)*255
+    pro_array = np.log((pro_array)+1.0)
+
+    plt.figure(11+CentrePoints.shape[0])
+    plt.grid(True)
+
+
+
+    plt.contourf(pro_array)
+    print(pro_array)
+    plt.plot(all_data[:,0]*10.0,all_data[:,1]*10.0,'b+')
+    plt.plot(CentrePoints[:,0]*10.0,CentrePoints[:,1]*10.0,'rD')
+    plt.savefig("a{0}.jpg".format(CentrePoints.shape[0]))
+    print(pro_array.shape)
+
+
+
 
 
 
@@ -82,7 +120,7 @@ def KMeans(Data,k=5):
 
 
 
-    print("lable:",labels)
+    # print("lable:",labels)
     return labels
 
 
@@ -104,8 +142,6 @@ def KMeansPP(Data,k=5):
     '''
     centre_points = np.zeros([k,Data.shape[1]])
 
-    # centre_points[:,0] = np.random.uniform(min(Data[:,0]),max(Data[:,0]),k)
-    # centre_points[:,1] = np.random.uniform(min(Data[:,1]),max(Data[:,1]),k)
     '''
     Select N centre points
     '''
@@ -113,14 +149,16 @@ def KMeansPP(Data,k=5):
     selected_num = 1
 
     while selected_num < k:
-        Distance_all = np.zeros([Data.shape[0],selected_num])
+        plotAndSave(centre_points[:selected_num,:],Data) # plot probability contour.
+        distance_all = np.zeros([Data.shape[0],selected_num])
 
         for i in range(selected_num):
-            Distance_all[:,i] = np.sum((Data-centre_points[int(i)])**2.0,1)**0.5
-        D = np.min(Distance_all,1)
+            distance_all[:,i] = np.sum((Data-centre_points[int(i)])**2.0,1)**0.5
 
+        D = np.min(distance_all,1)
         D = D / np.sum(D)
 
+        # Select new center points according to probability
         index = 0
         pro = np.random.uniform(0,1.0,1)
 
@@ -131,6 +169,8 @@ def KMeansPP(Data,k=5):
         if index < Data.shape[0]:
             centre_points[selected_num,:] = Data[index,:]
             selected_num += 1
+        else:
+            break
 
 
 
@@ -184,7 +224,7 @@ def KMeansPP(Data,k=5):
 
 
 
-    print("lable:",labels)
+    # print("lable:",labels)
     return labels
 
 
@@ -285,19 +325,6 @@ def ISODATA(Data,k=5,theta_N = 20,theta_S=1.0,theta_c =1.0,L=1,I=10):
             step_flag = 8
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     return np.zeros(Data.shape[0])
 
 
@@ -356,4 +383,5 @@ if __name__ == '__main__':
 
 
 
+    test_fig.savefig("all.svg")
     plt.show()
